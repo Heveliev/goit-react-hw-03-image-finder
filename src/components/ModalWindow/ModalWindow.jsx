@@ -34,7 +34,6 @@ window.removeEventListener('keydown', this.handleKeyDown)
         return  createPortal(
             <Overlay onClick={this.handleOverlayClick}>
       <Modal >
-        {/* <img src="" alt="" /> */}
         {this.props.children}
       </Modal>
     </Overlay>,
