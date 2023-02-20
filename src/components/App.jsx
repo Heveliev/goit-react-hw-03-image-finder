@@ -4,6 +4,10 @@ import { GalleryList } from "./GalleryList/GalleryList";
 import { Header } from './Header/Header';
 import { ColorRing } from 'react-loader-spinner';
 import { ButtonLoadMore } from "./ButtomLoadMore/ButtomLoadMore";
+import { getApi } from '../getApi/getApi';
+import { animateScroll as scroll } from 'react-scroll';
+
+
 
 
 class App extends React.Component  {
@@ -14,16 +18,22 @@ class App extends React.Component  {
     image: [],
     error: null,
     status: 'idle',
-    page:1,
+    page: 1,
+    showBtn: false,
+    scrollToBottom:function() {
+    scroll.scrollToBottom()
+  }
 
   }
 
 
 
     componentDidUpdate(prevProps, prevState) {
-        const prevValue = prevState.inputValue;
+      const prevValue = prevState.inputValue;
+      const prevPage = prevState.page;
       const nextValue = this.state.inputValue;
-      if (prevValue !== nextValue) {
+      const nextPage = this.state.page;
+      if (prevValue !== nextValue || prevPage !== nextPage) {
         this.setState({status:'pending'})
         this.fetchImg();
 
@@ -33,17 +43,10 @@ class App extends React.Component  {
 
   fetchImg = () => {
     const { inputValue, page } = this.state;
- fetch(`https://pixabay.com/api/?key=33000305-b629afd170357acb9b33609ec&q=${inputValue}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=12`)
-                .then(res => {
-                    if (res.ok) {
-                        return res.json()
-                    }
-                    
-                    return Promise.reject(new Error(`${inputValue} value is not found`))
-                }).then(img =>
+    getApi(inputValue,page).then(img =>
         this.setState(prevState => ({
             image: [...prevState.image, ...img.hits],
-            page: prevState.page + 1,
+          showBtn: this.state.page < Math.ceil(img.totalHits / 12)
             
           
           })
@@ -61,12 +64,16 @@ class App extends React.Component  {
     })
 }
 
+  handleClickLoadMore = () => {
+    this.setState(prevState => ({ page: prevState.page + 1 }))
+    this.state.scrollToBottom()
+  }
 
 
 
 
   render(){
-    const { error, status } = this.state;
+    const { error, status,showBtn } = this.state;
     return (
       <AppStyle>
         <Header onSubmit={this.handleSubmitForm} />
@@ -78,9 +85,8 @@ class App extends React.Component  {
                 ariaLabel="blocks-loading"
           colors={['#e15b64', '#f47e60', '#f8b26a', '#abbd81', '#849b87']} /></div>)}
         {status === 'rejected' && (<div><p>{error.message}</p></div>)}
-        {status === 'resolved' && (<><GalleryList image={this.state.image} />
-          <ButtonLoadMore title='Load more' onClick={this.fetchImg} />
-        </>)}
+        {status === 'resolved' && (<GalleryList image={this.state.image} />)}
+        {showBtn && (<ButtonLoadMore title='Load more' onClick={this.handleClickLoadMore} />)}
       </AppStyle>
     );
   }
