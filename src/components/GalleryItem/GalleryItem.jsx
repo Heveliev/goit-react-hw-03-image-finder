@@ -1,6 +1,7 @@
 import { Item, Image } from "./GalleryItem.styled";
 import { ModalWindow } from "components/ModalWindow/ModalWindow";
 import React from "react";
+import PropTypes from 'prop-types';
 
 
 export class GalleryItem extends React.Component {
@@ -25,4 +26,10 @@ export class GalleryItem extends React.Component {
             </Item>
         )
     }
+}
+
+GalleryItem.propTypes = {
+    img:PropTypes.string.isRequired,
+    user:PropTypes.string.isRequired,
+    urlBig:PropTypes.string.isRequired
 }
