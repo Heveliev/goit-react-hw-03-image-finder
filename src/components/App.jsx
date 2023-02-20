@@ -24,7 +24,7 @@ class App extends React.Component  {
         const prevValue = prevState.inputValue;
       const nextValue = this.state.inputValue;
       if (prevValue !== nextValue) {
-
+        this.setState({status:'pending'})
         this.fetchImg();
 
                 
@@ -44,6 +44,7 @@ class App extends React.Component  {
         this.setState(prevState => ({
             image: [...prevState.image, ...img.hits],
             page: prevState.page + 1,
+            
           
           })
       )
